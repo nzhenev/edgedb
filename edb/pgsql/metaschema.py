@@ -3704,8 +3704,14 @@ class GetCachedReflection(dbops.Function):
 class GetBaseScalarTypeMap(dbops.Function):
     """Return a map of base EdgeDB scalar type ids to Postgres type names."""
 
+    # FIXME: ridiculous hack to map range<intXX> onto intXrange. Needs some
+    # actual proper structure.
     text = f'''
         VALUES
+            ('2dcd88a1-d377-baa4-c12e-d4abfef28c86'::uuid,
+             {ql('pg_catalog.int8range')}),
+            ('9cd6f1bb-820a-e4e0-15cf-bc45c4e7baa0'::uuid,
+             {ql('pg_catalog.int4range')}),
             {", ".join(
                 f"""(
                     {ql(str(k))}::uuid,

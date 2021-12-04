@@ -18,13 +18,17 @@
 
 CREATE MODULE cal;
 
-CREATE SCALAR TYPE cal::local_datetime EXTENDING std::anyscalar;
+CREATE SCALAR TYPE cal::local_datetime
+    EXTENDING std::anyscalar, std::anycontiguous;
 
-CREATE SCALAR TYPE cal::local_date EXTENDING std::anyscalar;
+CREATE SCALAR TYPE cal::local_date
+    EXTENDING std::anyscalar, std::anydiscrete;
 
-CREATE SCALAR TYPE cal::local_time EXTENDING std::anyscalar;
+CREATE SCALAR TYPE cal::local_time
+    EXTENDING std::anyscalar, std::anycontiguous;
 
-CREATE SCALAR TYPE cal::relative_duration EXTENDING std::anyscalar;
+CREATE SCALAR TYPE cal::relative_duration
+    EXTENDING std::anyscalar, std::anycontiguous;
 
 
 ## Functions

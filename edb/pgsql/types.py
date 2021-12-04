@@ -165,6 +165,10 @@ def pg_type_array(tp: Tuple[str, ...]) -> Tuple[str, ...]:
         return (tp[0], tp[1] + '[]')
 
 
+def pg_type_range(tp: Tuple[str, ...]) -> Tuple[str, ...]:
+    return (tp[0] + 'range',)
+
+
 def pg_type_from_object(
         schema: s_schema.Schema,
         obj: s_obj.Object,
@@ -191,6 +195,15 @@ def pg_type_from_object(
                 persistent_tuples=persistent_tuples)
             return pg_type_array(tp)
 
+    elif isinstance(obj, s_abc.Range):
+        if obj.is_polymorphic(schema):
+            return ('anyrange',)
+        else:
+            tp = pg_type_from_object(
+                schema, obj.get_subtypes(schema)[0],
+                persistent_tuples=persistent_tuples)
+            return pg_type_range(tp)
+
     elif isinstance(obj, s_objtypes.ObjectType):
         return ('uuid',)
 
@@ -216,10 +229,19 @@ def pg_type_from_ir_typeref(
                 ir_typeref.subtypes[0],
                 serialized=serialized,
                 persistent_tuples=persistent_tuples)
-            if len(tp) == 1:
-                return (tp[0] + '[]',)
-            else:
-                return (tp[0], tp[1] + '[]')
+            return pg_type_array(tp)
+
+    if irtyputils.is_range(ir_typeref):
+        if (irtyputils.is_generic(ir_typeref)
+                or (irtyputils.is_abstract(ir_typeref.subtypes[0])
+                    and irtyputils.is_scalar(ir_typeref.subtypes[0]))):
+            return ('anyrange',)
+        else:
+            tp = pg_type_from_ir_typeref(
+                ir_typeref.subtypes[0],
+                serialized=serialized,
+                persistent_tuples=persistent_tuples)
+            return pg_type_range(tp)
 
     elif irtyputils.is_anytuple(ir_typeref):
         return ('record',)
