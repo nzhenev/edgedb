@@ -546,6 +546,9 @@ class ScriptInfo:
     params: typing.Dict[str, Param]
     """All parameters in all statements in the script"""
 
+    schema: s_schema.Schema
+    """The schema after preprocessing. (Collections may have been created.)"""
+
 
 class MaterializeVolatile(Base):
     pass
